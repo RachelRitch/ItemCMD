@@ -26,12 +26,20 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public class ItemcmdInteraction extends SimpleInstantInteraction {
     protected String command;
+    protected boolean debug;
 
-    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec.builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("Executes command when interacted with block")
+    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec.builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("execute cmd on player with item!")
                 .append(new KeyedCodec<>("Command", Codec.STRING),
                         (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
                         (executeCommandInteraction) -> executeCommandInteraction.command)
-                .documentation("Command that will be executed when used placeholder: {player}").add().build();
+                .documentation("Command that will be executed when used placeholder: {player}")
+                .add()
+                .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
+                    (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
+                    (debugInteraction) -> debugInteraction.debug)
+                .documentation("enable and disable debug infomation for when using a item")
+                .add()
+                .build();
 
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -40,7 +48,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType it,@Nonnull InteractionContext ic,@Nonnull CooldownHandler cooldown){
         CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
         LOGGER = HytaleLogger.get("<ItemCMD>");
-        if (commandBuffer == null){
+        if (commandBuffer == null && debug){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("CommandBuffer is null");
             return;
@@ -50,14 +58,14 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         Store<EntityStore> store = commandBuffer.getExternalData().getStore();
         Ref<EntityStore> ref = ic.getEntity();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
-        if (player == null){
+        if (player == null && debug){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
             return;
         }
 
         ItemStack itemstack = ic.getHeldItem();
-          if (itemstack == null){
+          if (itemstack == null && debug){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("itemstack is null");
             return;
@@ -67,9 +75,11 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
 
 
         if (resolved != null){
-            player.sendMessage(Message.raw("You have used the custom item with: " + resolved));
+            if (debug){
+                player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
+            }
             CommandManager.get().handleCommand(player, resolved);
-        } else {
+        } else if (debug) {
             player.sendMessage(Message.raw("Item not Configured!"));
         }
 
