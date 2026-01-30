@@ -48,7 +48,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
     protected void firstRun(@Nonnull InteractionType it,@Nonnull InteractionContext ic,@Nonnull CooldownHandler cooldown){
         CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
         LOGGER = HytaleLogger.get("<ItemCMD>");
-        if (commandBuffer == null && debug){
+        if (commandBuffer == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("CommandBuffer is null");
             return;
@@ -58,27 +58,27 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         Store<EntityStore> store = commandBuffer.getExternalData().getStore();
         Ref<EntityStore> ref = ic.getEntity();
         Player player = commandBuffer.getComponent(ref, Player.getComponentType());
-        if (player == null && debug){
+        if (player == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
             return;
         }
 
         ItemStack itemstack = ic.getHeldItem();
-          if (itemstack == null && debug){
+        if (itemstack == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("itemstack is null");
             return;
         }
-
-        String resolved = command.replace("{player}", player.getDisplayName());
-
-
         if (command == null){
             if(debug){
                 player.sendMessage(Message.raw("No command given!"));
             }
             return;
+        }
+        String resolved = command;
+        if (command.contains("{player}")){
+         resolved = resolved.replace("{player}", player.getDisplayName());
         }
         if (resolved != null){
             if (debug){
