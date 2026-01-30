@@ -74,6 +74,12 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         String resolved = command.replace("{player}", player.getDisplayName());
 
 
+        if (command == null){
+            if(debug){
+                player.sendMessage(Message.raw("No command given!"));
+            }
+            return;
+        }
         if (resolved != null){
             if (debug){
                 player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
