@@ -1,12 +1,12 @@
 {
   "Group": "dev.hytalemodding",
-  "Name": "ExamplePlugin",
+  "Name": "ItemCMD",
   "Version": "1.0.0",
-  "Description": "Description of your plugin",
+  "Description": "A mod for Hytale that add commands for items!",
   "Authors": [
     {
-      "Name": "Your Name",
-      "Email": "your.email@example.com",
+      "Name": "Rachel Ritch",
+      "Email": "RachelRitch28@gmail.com",
       "Url": "https://your-website.com"
     }
   ],
@@ -16,5 +16,5 @@
   "OptionalDependencies": {},
   "DisabledByDefault": false,
   "IncludesAssetPack": false,
-  "Main": "dev.hytalemodding.ExamplePlugin"
+  "Main": "dev.hytalemodding.ItemcmdPlugin"
 }
