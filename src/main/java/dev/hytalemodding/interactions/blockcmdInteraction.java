@@ -7,22 +7,24 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.CommandBuffer;
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Vector3i;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandManager;
+import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+
 
 
 public class blockcmdInteraction extends SimpleBlockInteraction {
@@ -33,13 +35,13 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
                 .append(new KeyedCodec<>("Command", Codec.STRING),
                         (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
                         (executeCommandInteraction) -> executeCommandInteraction.command)
-                .documentation("Command that will be executed when used! placeholder: {player}")
-                .add()
+                .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
+                .add() //add command slot to asset node json
                 .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
                     (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
                     (debugInteraction) -> debugInteraction.debug)
                 .documentation("enable and disable debug infomation for when using a item")
-                .add()
+                .add() //add debug command boolean to asset node json
                 .build();
 
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -55,36 +57,61 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
       @Nonnull CooldownHandler cooldownhandler
    ){
         LOGGER = HytaleLogger.get("<ItemCMD>");
-        Ref<EntityStore> ref = interactionContext.getEntity();
-        Player player = commandBuffer.getComponent(ref, Player.getComponentType());
+        final PlayerRef player = world.getEntityStore().getStore().getComponent(interactionContext.getEntity(), PlayerRef.getComponentType()); //player interacted with block
+        final var allPlayers =  world.getPlayerRefs(); //player list
+        
         if (player == null){
             interactionContext.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
             return;
         }
-
+        
+        //get block id ex. Example_Block
+        final String block = world.getBlockType(vector).getId();
+       
+        if (block == null){
+            if(debug){
+                player.sendMessage(Message.raw("No commandblock! ;)"));
+            }
+            return;
+        }
+        
         if (command == null){
             if(debug){
                 player.sendMessage(Message.raw("No command given!"));
             }
             return;
         }
-        String resolved = command;
+        
+        final String resolved = command;
+        @Nonnull String playerResolved = command;
+        
         if (command.contains("{player}")){
-         resolved = resolved.replace("{player}", player.getDisplayName());
+          playerResolved = resolved.replace("{player}", player.getUsername());
         }
-        if (resolved != null){
-            if (debug){
-                player.sendMessage(Message.raw("You have used the " + interactionContext.getHeldItem().getItemId() + " with: " + resolved));
+        //if used placeholder {allplayers} then sends cmd to each player online
+        if (command.contains("{allplayers}")){
+            if (resolved != null){
+                if (debug){
+                    player.sendMessage(Message.raw("You have used the block: " + block + " with: " + resolved));
+                }
+                allPlayers.forEach(playerRef -> {
+                    String playersResolved = resolved.replace("{allplayers}", playerRef.getUsername());
+                    CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playersResolved);
+                });
             }
-            CommandManager.get().handleCommand(player, resolved);
-        } else if (debug) {
-            player.sendMessage(Message.raw("block not Configured!"));
+        }
+        
+        //if command exist then send command
+        if (playerResolved != null){
+            if (debug){
+                player.sendMessage(Message.raw("You have used the block: " + block + " with: " + playerResolved));
+            }
+            CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playerResolved);
         }
    }
 
     @Override
     protected void simulateInteractWithBlock(InteractionType it, InteractionContext ic, ItemStack is, World world, Vector3i vctr) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
