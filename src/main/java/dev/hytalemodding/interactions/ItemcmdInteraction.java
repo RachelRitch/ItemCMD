@@ -13,6 +13,7 @@ import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandManager;
+import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
@@ -46,18 +47,21 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
 
     @Override
     protected void firstRun(@Nonnull InteractionType it,@Nonnull InteractionContext ic,@Nonnull CooldownHandler cooldown){
-        CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
+        final CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
         LOGGER = HytaleLogger.get("<ItemCMD>");
+        
         if (commandBuffer == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("CommandBuffer is null");
             return;
         }
 
-        World world = commandBuffer.getExternalData().getWorld();
-        Store<EntityStore> store = commandBuffer.getExternalData().getStore();
-        Ref<EntityStore> ref = ic.getEntity();
-        Player player = commandBuffer.getComponent(ref, Player.getComponentType());
+        final World world = commandBuffer.getExternalData().getWorld();
+        final Store<EntityStore> store = commandBuffer.getExternalData().getStore();
+        final Ref<EntityStore> ref = ic.getEntity();
+        final Player player = commandBuffer.getComponent(ref, Player.getComponentType());
+        final var allPlayers =  world.getPlayerRefs();
+       
         if (player == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
@@ -65,6 +69,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         }
 
         ItemStack itemstack = ic.getHeldItem();
+        
         if (itemstack == null){
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("itemstack is null");
@@ -76,10 +81,28 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
             }
             return;
         }
+        
         String resolved = command;
+        final String finalResolved = resolved;
+        
         if (command.contains("{player}")){
          resolved = resolved.replace("{player}", player.getDisplayName());
         }
+
+        //if used placeholder {allplayers} then sends cmd to each player online
+        if (command.contains("{allplayers}")){
+            if (resolved != null){
+                if (debug){
+                    player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
+                }
+                allPlayers.forEach(playerRef -> {
+                    String playersResolved = finalResolved.replace("{allplayers}", playerRef.getUsername());
+                    CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playersResolved);
+                });
+            }
+        }
+
+
         if (resolved != null){
             if (debug){
                 player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
