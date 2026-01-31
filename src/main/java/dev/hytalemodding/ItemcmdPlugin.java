@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
 import dev.hytalemodding.events.ItemcmdEvent;
 import dev.hytalemodding.interactions.ItemcmdInteraction;
+import dev.hytalemodding.interactions.blockcmdInteraction;
 
 public class ItemcmdPlugin extends JavaPlugin {
 
@@ -24,5 +25,9 @@ public class ItemcmdPlugin extends JavaPlugin {
             "ItemCMD_itemCommand_Interaction",
             ItemcmdInteraction.class,
             ItemcmdInteraction.CODEC);
+        this.getCodecRegistry(Interaction.CODEC).register(
+            "ItemCMD_blockCommand_Interaction",
+            blockcmdInteraction.class,
+            blockcmdInteraction.CODEC);
     }
 }
