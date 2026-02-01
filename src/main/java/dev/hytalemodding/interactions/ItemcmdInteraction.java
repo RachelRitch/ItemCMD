@@ -33,7 +33,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
                 .append(new KeyedCodec<>("Command", Codec.STRING),
                         (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
                         (executeCommandInteraction) -> executeCommandInteraction.command)
-                .documentation("Command that will be executed when used! placeholder: {player}")
+                .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
                 .add()
                 .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
                     (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
@@ -92,16 +92,16 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         //if used placeholder {allplayers} then sends cmd to each player online
         if (command.contains("{allplayers}")){
             if (resolved != null){
-                if (debug){
-                    player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
-                }
+
                 allPlayers.forEach(playerRef -> {
                     String playersResolved = finalResolved.replace("{allplayers}", playerRef.getUsername());
+                    if (debug){
+                        player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + playersResolved));
+                    }
                     CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playersResolved);
                 });
             }
         }
-
 
         if (resolved != null){
             if (debug){

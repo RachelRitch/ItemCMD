@@ -59,49 +59,49 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
         LOGGER = HytaleLogger.get("<ItemCMD>");
         final PlayerRef player = world.getEntityStore().getStore().getComponent(interactionContext.getEntity(), PlayerRef.getComponentType()); //player interacted with block
         final var allPlayers =  world.getPlayerRefs(); //player list
-        
+
         if (player == null){
             interactionContext.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
             return;
         }
-        
+
         //get block id ex. Example_Block
         final String block = world.getBlockType(vector).getId();
-       
+
         if (block == null){
             if(debug){
                 player.sendMessage(Message.raw("No commandblock! ;)"));
             }
             return;
         }
-        
+
         if (command == null){
             if(debug){
                 player.sendMessage(Message.raw("No command given!"));
             }
             return;
         }
-        
+
         final String resolved = command;
         @Nonnull String playerResolved = command;
-        
+
         if (command.contains("{player}")){
           playerResolved = resolved.replace("{player}", player.getUsername());
         }
         //if used placeholder {allplayers} then sends cmd to each player online
         if (command.contains("{allplayers}")){
             if (resolved != null){
-                if (debug){
-                    player.sendMessage(Message.raw("You have used the block: " + block + " with: " + resolved));
-                }
                 allPlayers.forEach(playerRef -> {
                     String playersResolved = resolved.replace("{allplayers}", playerRef.getUsername());
+                    if (debug){
+                        player.sendMessage(Message.raw("You have used the block: " + block + " with: " + playersResolved));
+                    }
                     CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playersResolved);
                 });
             }
         }
-        
+
         //if command exist then send command
         if (playerResolved != null){
             if (debug){
