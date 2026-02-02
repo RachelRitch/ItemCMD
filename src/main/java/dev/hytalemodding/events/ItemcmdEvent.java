@@ -6,6 +6,8 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 
 public class ItemcmdEvent {
 
+
+    //example not used
     public static void onPlayerReady(PlayerReadyEvent event) {
         Player player = event.getPlayer();
         player.sendMessage(Message.raw("Welcome " + player.getDisplayName()));

@@ -22,39 +22,22 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Sim
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
-
-
-
 public class ItemcmdInteraction extends SimpleInstantInteraction {
     protected String command;
     protected boolean debug;
 
-    // Codec for adding new components to items json file
-    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec.builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("execute cmd on player with item!")
-                .append(new KeyedCodec<>("Command", Codec.STRING),
-                        (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
-                        (executeCommandInteraction) -> executeCommandInteraction.command)
-                .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
-                .add()
-                .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
-                    (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
-                    (debugInteraction) -> debugInteraction.debug)
-                .documentation("enable and disable debug infomation for when using a item")
-                .add()
-                .build();
-
-    //logger
+    // logger
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-
     @Override
-    protected void firstRun(@Nonnull InteractionType it,@Nonnull InteractionContext ic,@Nonnull CooldownHandler cooldown){
+    protected void firstRun(@Nonnull InteractionType it, @Nonnull InteractionContext ic,
+            @Nonnull CooldownHandler cooldown) {
         // get commandbuffer
         final CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
         // add <ItemCMD> to logs
         LOGGER = HytaleLogger.get("<ItemCMD>");
-        
-        if (commandBuffer == null){
+
+        if (commandBuffer == null) {
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("CommandBuffer is null");
             return;
@@ -64,61 +47,78 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         final Store<EntityStore> store = commandBuffer.getExternalData().getStore();
         final Ref<EntityStore> ref = ic.getEntity();
         final Player player = commandBuffer.getComponent(ref, Player.getComponentType());
-        final var allPlayers =  world.getPlayerRefs();
-       
-        if (player == null){
+        final var allPlayers = world.getPlayerRefs();
+
+        if (player == null) {
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
             return;
         }
-        //get item held in head
+        // get item held in head
         ItemStack itemstack = ic.getHeldItem();
-        
-        if (itemstack == null){
+
+        if (itemstack == null) {
             ic.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("itemstack is null");
             return;
         }
-        if (command == null){
-            if(debug){
+        if (command == null) {
+            if (debug) {
                 player.sendMessage(Message.raw("No command given!"));
             }
             return;
         }
-        //resolved for replacing placeholders
+        // resolved for replacing placeholders
         String resolved = command;
         // finalResolved for lambda function had to be final ;(
         final String finalResolved = resolved;
-        
-        if (command.contains("{player}")){
-         resolved = resolved.replace("{player}", player.getDisplayName());
+
+        if (command.contains("{player}")) {
+            resolved = resolved.replace("{player}", player.getDisplayName());
         }
 
-        //if used placeholder {allplayers} then sends cmd to each player online
-        if (command.contains("{allplayers}")){
-            if (resolved != null){
-
+        // if used placeholder {allplayers} then sends cmd to each player online
+        if (command.contains("{allplayers}")) {
+            if (resolved != null) {
+                // run for each player
                 allPlayers.forEach(playerRef -> {
                     String playersResolved = finalResolved.replace("{allplayers}", playerRef.getUsername());
-                    if (debug){
-                        player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + playersResolved));
+                    if (debug) {
+                        player.sendMessage(Message.raw(
+                                "You have used the " + ic.getHeldItem().getItemId() + " with: " + playersResolved));
                     }
+                    // run command
                     CommandManager.get().handleCommand(ConsoleSender.INSTANCE, playersResolved);
                 });
             }
         }
 
-        if (resolved != null){
-            if (debug){
-                player.sendMessage(Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
+        if (resolved != null) {
+            if (debug) {
+                player.sendMessage(
+                        Message.raw("You have used the " + ic.getHeldItem().getItemId() + " with: " + resolved));
             }
+            // run command
             CommandManager.get().handleCommand(player, resolved);
         } else if (debug) {
             player.sendMessage(Message.raw("Item not Configured!"));
         }
 
-
-
     }
+    // Codec for adding new components to items json file
+    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec
+            .builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)
+            .documentation("execute cmd on player with item!")
+            .append(new KeyedCodec<>("Command", Codec.STRING),
+                    (executeCommandInteraction, o) -> executeCommandInteraction.command = (String) o,
+                    (executeCommandInteraction) -> executeCommandInteraction.command)
+            .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
+            .add()
+            .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
+                    (debugInteraction, o) -> debugInteraction.debug = (boolean) o,
+                    (debugInteraction) -> debugInteraction.debug)
+            .documentation("enable and disable debug infomation for when using a item")
+            .add()
+            .build();
 
 }
