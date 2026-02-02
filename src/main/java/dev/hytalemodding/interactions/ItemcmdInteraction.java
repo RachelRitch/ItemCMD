@@ -29,6 +29,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
     protected String command;
     protected boolean debug;
 
+    // Codec for adding new components to items json file
     public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec.builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("execute cmd on player with item!")
                 .append(new KeyedCodec<>("Command", Codec.STRING),
                         (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
@@ -42,12 +43,15 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
                 .add()
                 .build();
 
+    //logger
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
 
     @Override
     protected void firstRun(@Nonnull InteractionType it,@Nonnull InteractionContext ic,@Nonnull CooldownHandler cooldown){
+        // get commandbuffer
         final CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
+        // add <ItemCMD> to logs
         LOGGER = HytaleLogger.get("<ItemCMD>");
         
         if (commandBuffer == null){
@@ -67,7 +71,7 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
             LOGGER.atInfo().log("player is null");
             return;
         }
-
+        //get item held in head
         ItemStack itemstack = ic.getHeldItem();
         
         if (itemstack == null){
@@ -81,8 +85,9 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
             }
             return;
         }
-        
+        //resolved for replacing placeholders
         String resolved = command;
+        // finalResolved for lambda function had to be final ;(
         final String finalResolved = resolved;
         
         if (command.contains("{player}")){
