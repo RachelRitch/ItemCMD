@@ -18,7 +18,9 @@ public class ItemcmdPlugin extends JavaPlugin {
 
     @Override
     protected void setup() {
+        //itemcmd command not used
         //this.getCommandRegistry().registerCommand(new ItemcmdCommand("itemcmd", "A command that allow you to create items that run commands!!"));
+        //itemcmd event not used
         //this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, ItemcmdEvent::onPlayerReady);
         this.getCodecRegistry(Interaction.CODEC).register(
             "ItemCMD_itemCommand_Interaction",
