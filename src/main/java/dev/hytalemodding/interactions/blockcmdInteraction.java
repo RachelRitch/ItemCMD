@@ -43,7 +43,7 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
                 .build();
 
    //var
-    protected String command;
+    public String command;
     protected boolean debug;
 
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();

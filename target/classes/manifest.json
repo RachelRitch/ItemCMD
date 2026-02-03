@@ -1,7 +1,7 @@
 {
   "Group": "dev.hytalemodding",
   "Name": "ItemCMD",
-  "Version": "1.0.0",
+  "Version": "1.0.2",
   "Description": "A mod for Hytale that add commands for items!",
   "Authors": [
     {
@@ -12,8 +12,10 @@
   ],
   "Website": "https://your-plugin-website.com",
   "ServerVersion": "*",
-  "Dependencies": {"OrbisGuard:OrbisGuard": "*"},
-  "OptionalDependencies": {},
+  "Dependencies": {},
+  "OptionalDependencies":{
+    "OrbisGuard:OrbisGuard": "*"
+  },
   "DisabledByDefault": false,
   "IncludesAssetPack": false,
   "Main": "dev.hytalemodding.ItemcmdPlugin"

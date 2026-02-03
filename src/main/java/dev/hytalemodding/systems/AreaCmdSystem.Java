@@ -20,6 +20,8 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.orbisguard.api.OrbisGuardAPI;
 import com.orbisguard.api.region.IRegion;
+import com.orbisguard.api.region.IRegionManager;
+
 
 
 
@@ -47,10 +49,15 @@ public class AreaCmdSystem extends EntityTickingSystem<EntityStore> {
 
         Vector3d pos  = playerRef.getTransform().getPosition();
         //is player in region
-        Set<IRegion> region = OrbisGuardAPI.getInstance().getRegionContainer().getRegionsAt(world.getName(), (int) pos.x, (int) pos.y, (int) pos.z);
+        OrbisGuardAPI api = OrbisGuardAPI.getInstance();
+        IRegionManager manager = api.getRegionContainer().getRegionManager(world.getName());
+        Set<IRegion> regions = manager.getRegionsAt((int) pos.x,(int) pos.y,(int) pos.z);
         //if in region get string
-        if (region == null) return;
-        else regionName = region.toString();
+        for (IRegion region : regions) {
+          if (region.getId() == null) regionName = null;
+          else regionName = region.getId();
+        }
+
 
 
     }
@@ -63,7 +70,7 @@ public class AreaCmdSystem extends EntityTickingSystem<EntityStore> {
     @Override
     @Nullable
     public Query<EntityStore> getQuery() {
-      return null;
+      return Query.any();
     }
 
 

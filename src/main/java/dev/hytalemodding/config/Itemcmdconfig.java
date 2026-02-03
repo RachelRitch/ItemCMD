@@ -23,6 +23,7 @@ public class Itemcmdconfig {
         .build();
 
     public Itemcmdconfig(){
+        
     }
 
     public Map<String, String> getItemCmds(){

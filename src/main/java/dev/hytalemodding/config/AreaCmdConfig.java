@@ -15,24 +15,29 @@ public class AreaCmdConfig {
     // Codec for adding new components to config json file
     public static final BuilderCodec<AreaCmdConfig> CODEC =
         BuilderCodec.builder(AreaCmdConfig.class, AreaCmdConfig::new)
-            .append(new KeyedCodec<>("AreaCmd", new  MapCodec<>(Codec.STRING, HashMap::new, false)),
+            .append(new KeyedCodec<>("AreaCmd", new  MapCodec<>(new MapCodec<>(Codec.STRING, HashMap::new, false), HashMap::new, false)),
             (data, value) -> data.AreaCmd = value,
             data -> data.AreaCmd)
         .add()
         .build();
     
-    private Map<String, String> AreaCmd = new HashMap<>();
+    private Map<String, Map<String, String>> AreaCmd = new HashMap<>();
 
 
     public AreaCmdConfig() {
     }
         //getter
-    public Map<String, String> getMap(Map<String, String>  AreaMap){
+    public Map<String, Map<String, String>> getMap(){
         return AreaCmd;
     }
         //setter
-    public void setMap(Map<String, String>  AreaMap){
+    public void setMap(Map<String, Map<String, String>> AreaMap){
         this.AreaCmd = AreaMap;
+    }
+
+
+    public void deleteMap(String region){
+        AreaCmd.remove(region);
     }
 
 }
