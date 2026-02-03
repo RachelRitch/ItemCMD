@@ -1,4 +1,4 @@
-package dev.hytalemodding.commands;
+package dev.hytalemodding.commands.subcommands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -11,25 +11,13 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import jakarta.annotation.Nonnull;
 import lombok.NonNull;
 
-
-
-public class ItemcmdCommand extends AbstractPlayerCommand {
-    
-   
-
-    
-
- 
-
-    public ItemcmdCommand(String name, String description) {
-        super(name, description);
-        addAliases("ic" , "icmd");
+public class AreaCmdDelete extends AbstractPlayerCommand {
+    public AreaCmdDelete(){
+        super("delete","delete a command for a area");
     }
-
     @NonNull
     @Override
-    protected void execute(@Nonnull CommandContext context, Store<EntityStore> store, Ref<EntityStore> ref,PlayerRef pr, World world) {
+    public void execute(@Nonnull CommandContext context, Store<EntityStore> store, Ref<EntityStore> ref,PlayerRef pr, World world){
 
     }
-
 }

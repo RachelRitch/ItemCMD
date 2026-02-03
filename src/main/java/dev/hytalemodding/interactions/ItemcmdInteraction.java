@@ -23,15 +23,34 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 public class ItemcmdInteraction extends SimpleInstantInteraction {
+
+    // Codec for adding new components to items json file
+    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec
+            .builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)
+            .documentation("execute cmd on player with item!")
+            .append(new KeyedCodec<>("Command", Codec.STRING),
+                    (executeCommandInteraction, o) -> executeCommandInteraction.command = (String) o,
+                    (executeCommandInteraction) -> executeCommandInteraction.command)
+            .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
+            .add()
+            .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
+                    (debugInteraction, o) -> debugInteraction.debug = (boolean) o,
+                    (debugInteraction) -> debugInteraction.debug)
+            .documentation("enable and disable debug infomation for when using a item")
+            .add()
+            .build();
+
+    //var
     protected String command;
     protected boolean debug;
+
 
     // logger
     public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Override
     protected void firstRun(@Nonnull InteractionType it, @Nonnull InteractionContext ic,
-            @Nonnull CooldownHandler cooldown) {
+        @Nonnull CooldownHandler cooldown) {
         // get commandbuffer
         final CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
         // add <ItemCMD> to logs
@@ -105,20 +124,5 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         }
 
     }
-    // Codec for adding new components to items json file
-    public static final BuilderCodec<ItemcmdInteraction> CODEC = BuilderCodec
-            .builder(ItemcmdInteraction.class, ItemcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)
-            .documentation("execute cmd on player with item!")
-            .append(new KeyedCodec<>("Command", Codec.STRING),
-                    (executeCommandInteraction, o) -> executeCommandInteraction.command = (String) o,
-                    (executeCommandInteraction) -> executeCommandInteraction.command)
-            .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
-            .add()
-            .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
-                    (debugInteraction, o) -> debugInteraction.debug = (boolean) o,
-                    (debugInteraction) -> debugInteraction.debug)
-            .documentation("enable and disable debug infomation for when using a item")
-            .add()
-            .build();
 
 }

@@ -28,6 +28,21 @@ import javax.annotation.Nullable;
 
 
 public class blockcmdInteraction extends SimpleBlockInteraction {
+    // Codec for adding new components to items json file
+    public static final BuilderCodec<blockcmdInteraction> CODEC = BuilderCodec.builder(blockcmdInteraction.class, blockcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("execute cmd on player with item!")
+                .append(new KeyedCodec<>("Command", Codec.STRING),
+                        (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
+                        (executeCommandInteraction) -> executeCommandInteraction.command)
+                .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
+                .add() //add command slot to asset node json
+                .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
+                    (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
+                    (debugInteraction) -> debugInteraction.debug)
+                .documentation("enable and disable debug infomation for when using a item")
+                .add() //add debug command boolean to asset node json
+                .build();
+
+   //var
     protected String command;
     protected boolean debug;
 
@@ -98,20 +113,10 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
         }
    }
 
+
     @Override
-    protected void simulateInteractWithBlock(InteractionType it, InteractionContext ic, ItemStack is, World world, Vector3i vctr) {
+    protected void simulateInteractWithBlock(InteractionType it, InteractionContext ic,@Nullable ItemStack is, World world, Vector3i vctr) {
     }
 
-    public static final BuilderCodec<blockcmdInteraction> CODEC = BuilderCodec.builder(blockcmdInteraction.class, blockcmdInteraction::new, SimpleInstantInteraction.ABSTRACT_CODEC)                .documentation("execute cmd on player with item!")
-                .append(new KeyedCodec<>("Command", Codec.STRING),
-                        (executeCommandInteraction, o) -> executeCommandInteraction.command=(String) o,
-                        (executeCommandInteraction) -> executeCommandInteraction.command)
-                .documentation("Command that will be executed when used! placeholder: {player}, {allplayers}")
-                .add() //add command slot to asset node json
-                .append(new KeyedCodec<Boolean>("EnableDebug", Codec.BOOLEAN),
-                    (debugInteraction, o) -> debugInteraction.debug=(boolean) o,
-                    (debugInteraction) -> debugInteraction.debug)
-                .documentation("enable and disable debug infomation for when using a item")
-                .add() //add debug command boolean to asset node json
-                .build();
+
 }

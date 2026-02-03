@@ -15,7 +15,8 @@
 *.dmg
 *.gz
 *.iso
-*.jar  
+*.jar
+!oribisguard-api-0.7.3.jar
 *.rar
 *.tar
 *.zip
