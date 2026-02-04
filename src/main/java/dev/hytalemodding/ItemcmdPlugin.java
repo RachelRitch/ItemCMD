@@ -2,7 +2,6 @@ package dev.hytalemodding;
 
 import javax.annotation.Nonnull;
 
-import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -12,9 +11,9 @@ import com.orbisguard.api.OrbisGuardAPI;
 import dev.hytalemodding.commands.AreaCmdCommand;
 import dev.hytalemodding.commands.ItemcmdCommand;
 import dev.hytalemodding.config.AreaCmdConfig;
-import dev.hytalemodding.events.ItemcmdEvent;
 import dev.hytalemodding.interactions.ItemcmdInteraction;
 import dev.hytalemodding.interactions.blockcmdInteraction;
+import dev.hytalemodding.systems.AreaCmdConstant;
 import dev.hytalemodding.systems.AreaCmdSystem;
 
 
@@ -37,9 +36,7 @@ public class ItemcmdPlugin extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new ItemcmdCommand("itemcmd", "A command that allow you to create items that run commands!!"));
         this.getCommandRegistry().registerCommand(new AreaCmdCommand("areacmd","A command that allow areas to run commands!!", this.config));
         //events
-        this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, ItemcmdEvent::onPlayerReady);
 
-    
         //Codec for interaction
         this.getCodecRegistry(Interaction.CODEC).register(
             "ItemCMD_itemCommand_Interaction",
@@ -50,13 +47,11 @@ public class ItemcmdPlugin extends JavaPlugin {
             blockcmdInteraction.class,
             blockcmdInteraction.CODEC);
         //Systems
-        AreaCmdSystem areaSystem = new AreaCmdSystem();
-        if (api != null) this.getEntityStoreRegistry().registerSystem(new AreaCmdSystem());
+        if (api != null){
+        this.getEntityStoreRegistry().registerSystem(new AreaCmdSystem(config));
+        this.getEntityStoreRegistry().registerSystem(new AreaCmdConstant(300, config));
+        }
+
         config.save();
-
-    
-
     }
-    
-
 }

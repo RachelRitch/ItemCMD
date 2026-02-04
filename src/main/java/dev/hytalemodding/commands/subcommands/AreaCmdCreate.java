@@ -32,7 +32,7 @@ public class AreaCmdCreate extends AbstractPlayerCommand  {
         super("create","create a cmd for a area");
         this.region = this.withRequiredArg("region", "the name of the area you want to add the command too", ArgTypes.STRING);
         this.command = this.withRequiredArg("command", "the command you want to use in quotes", ArgTypes.STRING);
-        this.active = this.withRequiredArg("activated", "when the command is activated", ArgTypes.STRING);
+        this.active = this.withRequiredArg("type", "when the command is activated", ArgTypes.STRING);
         this.debug = this.withFlagArg("debug", "enable debug option");
         this.config = config;
     }
@@ -43,14 +43,14 @@ public class AreaCmdCreate extends AbstractPlayerCommand  {
         AreaCmdConfig settings = config.get();
         Map<String, Map<String, String>> areaCMD = settings.getMap();
         Map<String, String> innerAreaCmd = new HashMap<>();
-
+        String commandcmd = command.get(context).substring(1, command.get(context).length() - 1);
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null) return;
         if (debug.get(context)) {
             player.sendMessage(Message.raw("Region: " + region.get(context) + ", command: " + command.get(context))); 
             return;
         }
-        innerAreaCmd.put(command.get(context), active.get(context));
+        innerAreaCmd.put(commandcmd, active.get(context));
         areaCMD.put(region.get(context), innerAreaCmd);
         settings.setMap(areaCMD);
         config.save();
