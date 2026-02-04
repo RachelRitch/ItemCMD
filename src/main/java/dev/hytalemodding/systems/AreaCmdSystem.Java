@@ -100,6 +100,18 @@ public class AreaCmdSystem extends DelayedEntitySystem<EntityStore> {
             });
           }
         }
+        if(status){
+          if (innerMap != null) {
+            String targetAction = "looping";
+            innerMap.forEach((command, actionType) -> {
+              if (actionType.equalsIgnoreCase(targetAction)) {
+                CommandManager.get().handleCommand(ConsoleSender.INSTANCE, command);
+                player.sendMessage(Message.raw("Inner cmd and type: " + command + ", " + actionType));
+              }
+            });
+          }
+          player.sendMessage(Message.raw("Status is true!"));
+        }
         currentStatus = status;
     }
 

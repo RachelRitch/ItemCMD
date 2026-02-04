@@ -13,7 +13,6 @@ import dev.hytalemodding.commands.ItemcmdCommand;
 import dev.hytalemodding.config.AreaCmdConfig;
 import dev.hytalemodding.interactions.ItemcmdInteraction;
 import dev.hytalemodding.interactions.blockcmdInteraction;
-import dev.hytalemodding.systems.AreaCmdConstant;
 import dev.hytalemodding.systems.AreaCmdSystem;
 
 
@@ -49,7 +48,6 @@ public class ItemcmdPlugin extends JavaPlugin {
         //Systems
         if (api != null){
         this.getEntityStoreRegistry().registerSystem(new AreaCmdSystem(config));
-        this.getEntityStoreRegistry().registerSystem(new AreaCmdConstant(300, config));
         }
 
         config.save();
