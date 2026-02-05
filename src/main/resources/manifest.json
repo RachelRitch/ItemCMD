@@ -1,8 +1,8 @@
 {
   "Group": "dev.hytalemodding",
   "Name": "ItemCMD",
-  "Version": "1.0.2",
-  "Description": "A mod for Hytale that add commands for items!",
+  "Version": "1.0.3",
+  "Description": "A mod for Hytale that add commands for items, blocks, areas!",
   "Authors": [
     {
       "Name": "Rachel Ritch",

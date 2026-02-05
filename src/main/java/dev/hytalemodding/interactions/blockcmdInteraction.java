@@ -3,6 +3,7 @@ package dev.hytalemodding.interactions;
 
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.client.SimpleBlockInteraction;
+import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -23,6 +24,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 
 
@@ -46,7 +49,7 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
     public String command;
     protected boolean debug;
 
-    public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    HytaleLogger LOGGER = HytaleLogger.get("<ItemCMD>");
 
     @Override
     protected void interactWithBlock(
@@ -58,10 +61,10 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
       @Nonnull Vector3i vector,
       @Nonnull CooldownHandler cooldownhandler
    ){
-        LOGGER = HytaleLogger.get("<ItemCMD>");
+        
         final PlayerRef player = world.getEntityStore().getStore().getComponent(interactionContext.getEntity(), PlayerRef.getComponentType()); //player interacted with block
+        final Player playerp = world.getEntityStore().getStore().getComponent(interactionContext.getEntity(), Player.getComponentType()); 
         final var allPlayers =  world.getPlayerRefs(); //player list
-
         if (player == null){
             interactionContext.getState().state = InteractionState.Failed;
             LOGGER.atInfo().log("player is null");
@@ -70,6 +73,11 @@ public class blockcmdInteraction extends SimpleBlockInteraction {
 
         //get block id ex. Example_Block
         final String block = world.getBlockType(vector).getId();
+
+        if (!playerp.hasPermission("ItemCMD.BlockCMD.Item." + block)){
+            player.sendMessage(Message.raw("Missing permissions for block"));
+            return;
+        }
 
         if (block == null){
             if(debug){

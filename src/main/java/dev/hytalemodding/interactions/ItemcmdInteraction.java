@@ -19,6 +19,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.permissions.PermissionsModule;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
@@ -46,15 +48,15 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
 
 
     // logger
-    public HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    protected HytaleLogger LOGGER = HytaleLogger.get("<ItemCMD>");
 
     @Override
     protected void firstRun(@Nonnull InteractionType it, @Nonnull InteractionContext ic,
         @Nonnull CooldownHandler cooldown) {
         // get commandbuffer
         final CommandBuffer<EntityStore> commandBuffer = ic.getCommandBuffer();
-        // add <ItemCMD> to logs
-        LOGGER = HytaleLogger.get("<ItemCMD>");
+       
+    
 
         if (commandBuffer == null) {
             ic.getState().state = InteractionState.Failed;
@@ -63,7 +65,6 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         }
 
         final World world = commandBuffer.getExternalData().getWorld();
-        final Store<EntityStore> store = commandBuffer.getExternalData().getStore();
         final Ref<EntityStore> ref = ic.getEntity();
         final Player player = commandBuffer.getComponent(ref, Player.getComponentType());
         final var allPlayers = world.getPlayerRefs();
@@ -75,6 +76,11 @@ public class ItemcmdInteraction extends SimpleInstantInteraction {
         }
         // get item held in head
         ItemStack itemstack = ic.getHeldItem();
+
+        if (!player.hasPermission("ItemCMD.ItemCMD.Item." + itemstack.getItemId())){
+            player.sendMessage(Message.raw("Missing permissions for item"));
+            return;
+        }
 
         if (itemstack == null) {
             ic.getState().state = InteractionState.Failed;

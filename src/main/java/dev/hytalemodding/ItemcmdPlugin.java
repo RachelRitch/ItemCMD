@@ -2,6 +2,7 @@ package dev.hytalemodding;
 
 import javax.annotation.Nonnull;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -19,11 +20,13 @@ import dev.hytalemodding.systems.AreaCmdSystem;
 public class ItemcmdPlugin extends JavaPlugin {
 
     private final Config<AreaCmdConfig> config;
-
+    HytaleLogger LOGGER = HytaleLogger.get("<ItemCMD>");
     public ItemcmdPlugin(@Nonnull JavaPluginInit init) {
         super(init);
 
         this.config = this.withConfig("AreaCmdConfig", AreaCmdConfig.CODEC);
+        LOGGER.atInfo().log("ItemCMD Loaded!!");
+       
     }
 
     @Override
@@ -48,8 +51,10 @@ public class ItemcmdPlugin extends JavaPlugin {
         //Systems
         if (api != null){
         this.getEntityStoreRegistry().registerSystem(new AreaCmdSystem(config));
+        LOGGER.atInfo().log("ItemCMD found OrbisGuardAPI");
         }
 
         config.save();
+        LOGGER.atInfo().log("ItemCMD Setup Complete");
     }
 }
